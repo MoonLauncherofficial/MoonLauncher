@@ -37,19 +37,3 @@
 4. **Войди** через свою учётную запись Microsoft
 5. **Выбери** версию Minecraft и моды
 6. **Играй!**
-
----
-
-## 🛠️ Сборка из исходников
-
-### Требования
-- Visual Studio 2022 (или новее)
-- .NET 8.0 SDK
-- Git
-
-### Клонирование и сборка
-```bash
-git clone https://github.com/moonlauncher/MoonLauncher.git
-cd MoonLauncher
-dotnet restore
-dotnet build -c Release

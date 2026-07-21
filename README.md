@@ -1,23 +1,25 @@
 # 🌙 MoonLauncher
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/moonlauncher/MoonLauncher)](https://github.com/moonlauncher/MoonLauncher/releases)
-[![Downloads](https://img.shields.io/github/downloads/moonlauncher/MoonLauncher/total.svg)](https://github.com/moonlauncher/MoonLauncher/releases)
+[![GitHub release](https://img.shields.io/github/v/release/MoonLauncherofficial/MoonLauncher)](https://github.com/MoonLauncherofficial/MoonLauncher/releases)
+[![Downloads](https://img.shields.io/github/downloads/MoonLauncherofficial/MoonLauncher/total.svg)](https://github.com/MoonLauncherofficial/MoonLauncher/releases)
 
-**MoonLauncher** — это современный, быстрый и удобный лаунчер для Minecraft с поддержкой модов, шейдеров и ресурс-паков. Вход через Microsoft, автоматические обновления и чистый интерфейс.
+**MoonLauncher** — лаунчер для Minecraft на Electron с поддержкой модов, шейдеров, ресурс-паков и входом через Microsoft.
 
 ---
 
 ## ✨ Особенности
 
-- 🔐 **Microsoft авторизация** — безопасный вход через учётную запись Microsoft
-- 🎮 **Поддержка модов** — Forge, Fabric, Quilt. Установка из Modrinth в один клик
-- ✨ **Шейдеры** — встроенный менеджер шейдеров (OptiFine, Iris)
-- 🖼️ **Ресурс-паки** — управление и переключение прямо из лаунчера
-- 🗂️ **Инстансы** — несколько независимых сборок Minecraft на одном компьютере
-- 🔄 **Автообновления** — лаунчер обновляется сам, без лишних телодвижений
-- ⚡ **Высокая производительность** — лёгкий и не нагружает систему
-- 🌍 **Мультиязычность** — русский, английский и другие языки
+- 🔐 **Microsoft/Xbox авторизация** — полноценный OAuth-вход (MSA → Xbox Live → XSTS)
+- 🎮 **Загрузчики модов** — Forge, NeoForge, Fabric, Quilt
+- 📦 **Установка из Modrinth** — моды, шейдеры и ресурс-паки прямо из лаунчера (Modrinth API v2)
+- ☕ **Автозагрузка Java** — если подходящей JRE нет, лаунчер сам скачает и распакует нужную версию (Eclipse Temurin)
+- 🗂️ **Инстансы** — несколько независимых профилей/сборок, с возможностью дублирования
+- 🌐 **Серверы** — пинг серверов и список рекомендуемых
+- 🔗 **Обмен сборками** — экспорт/импорт инстанса по короткому коду
+- 🔄 **Автообновление лаунчера**
+- 🌍 **Локализация** — русский и английский
+- 🪟 **Кастомный интерфейс** — окно без системной рамки
 
 ---
 
@@ -26,15 +28,15 @@
 | Компонент | Минимум |
 |---|---|
 | ОС | Windows 10/11 (64-bit) |
-| Java | JDK 17+ (устанавливается автоматически при первом запуске) |
+| Java | Не требуется вручную — лаунчер скачает нужную версию автоматически |
 | ОЗУ | 4 ГБ (рекомендуется 8 ГБ для модов/шейдеров) |
-| Видеокарта | С поддержкой OpenGL 3.2+ / GL 4.6 для новых версий Forge |
+| Видеокарта | С поддержкой OpenGL 3.2+ / GL 4.6 для современных версий Forge |
 
 ---
 
 ## 📥 Скачать
 
-Последнюю версию можно скачать на [официальном сайте](https://moonlauncher.ru) или в [разделе релизов](https://github.com/moonlauncher/MoonLauncher/releases).
+Последнюю версию можно скачать на [официальном сайте](https://moonlauncher.ru) или в [разделе релизов](https://github.com/MoonLauncherofficial/MoonLauncher/releases).
 
 | Платформа | Ссылка |
 |-----------|--------|
@@ -48,7 +50,7 @@
 2. **Установи** (если используешь установщик)
 3. **Запусти** MoonLauncher.exe
 4. **Войди** через свою учётную запись Microsoft
-5. **Выбери** версию Minecraft и моды
+5. **Выбери** версию Minecraft, загрузчик модов и нужные моды
 6. **Играй!**
 
 ---
@@ -58,37 +60,36 @@
 <details>
 <summary><b>Ошибка входа: «Произошла ошибка при поиске учётной записи»</b></summary>
 
-Убедись, что используешь именно тот email, к которому привязана лицензия Minecraft (Xbox/Microsoft-аккаунт после миграции Mojang). Проверить это можно, войдя на [account.microsoft.com](https://account.microsoft.com) в браузере.
+Убедись, что используешь именно тот email, к которому привязана лицензия Minecraft (Xbox/Microsoft-аккаунт после миграции Mojang).
 </details>
 
 <details>
 <summary><b>Ошибка 429 (Too Many Requests) при входе через Microsoft</b></summary>
 
-Это временная блокировка со стороны Microsoft из-за слишком частых попыток входа. Закрой лаунчер, подожди 15–30 минут и попробуй войти один раз, не нажимая «Далее» повторно. Если используешь VPN/прокси — попробуй временно отключить.
+Временная блокировка со стороны Microsoft из-за частых попыток входа. Закрой лаунчер, подожди 15–30 минут и попробуй снова, не нажимая «Далее» несколько раз подряд.
 </details>
 
 <details>
-<summary><b>Краш при запуске: ResolutionException / module minecraft contains package</b></summary>
+<summary><b>Краш: ResolutionException / module minecraft contains package</b></summary>
 
-Конфликт дублирующихся библиотек Forge/Minecraft. Удали папку `libraries` в `%userprofile%\.moonlauncher\minecraft\` и запусти профиль заново — файлы перекачаются заново.
+Конфликт дублирующихся библиотек Forge/Minecraft. Удали папку `libraries` в `%userprofile%\.moonlauncher\minecraft\` и запусти профиль заново.
 </details>
 
 <details>
-<summary><b>Краш при запуске: Invalid paths argument, contained no existing paths</b></summary>
+<summary><b>Краш: Invalid paths argument, contained no existing paths</b></summary>
 
-Часть файлов Forge/Minecraft отсутствует физически (повреждённая или неполная закачка). Удали соответствующие версии в `libraries\net\minecraft\client\` и `libraries\net\minecraftforge\forge\`, затем перезапусти — лаунчер докачает недостающее.
+Часть файлов Forge/Minecraft отсутствует (повреждённая или неполная закачка). Удали версии в `libraries\net\minecraft\client\` и `libraries\net\minecraftforge\forge\`, затем перезапусти для повторной закачки.
 </details>
-
-Если проблема не решается — приложи лог запуска (`.moonlauncher/logs` или экран «Логи запуска» в настройках) при обращении за помощью.
 
 ---
 
-## 🤝 Обратная связь и поддержка
+## 🤝 Обратная связь
 
-Нашёл баг или есть предложение? Открой [issue на GitHub](https://github.com/moonlauncher/MoonLauncher/issues) или напиши в поддержку через официальный сайт.
+- [Discord](https://discord.gg/pqtJZ5GFkk)
+- [Issues на GitHub](https://github.com/MoonLauncherofficial/MoonLauncher/issues)
 
 ---
 
 ## 📄 Лицензия
 
-Проект распространяется под лицензией [MIT](LICENSE).
+MIT.

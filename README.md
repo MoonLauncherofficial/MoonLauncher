@@ -36,11 +36,11 @@
 
 ## 📥 Скачать
 
-Последнюю версию можно скачать на [официальном сайте](https://moonlauncher.ru) или в [разделе релизов](https://github.com/MoonLauncherofficial/MoonLauncher/releases).
+Последнюю версию можно скачать на [официальном сайте](http://moonlauncher.ru) или в [разделе релизов](https://github.com/MoonLauncherofficial/MoonLauncher/releases).
 
 | Платформа | Ссылка |
 |-----------|--------|
-| 🪟 Windows | [MoonLauncher-Setup.exe](https://moonlauncher.ru/download/MoonLauncher-Setup.exe) |
+| 🪟 Windows | [MoonLauncher-Setup.exe](http://moonlauncher.ru/download/MoonLauncher-Setup.exe) |
 
 ---
 

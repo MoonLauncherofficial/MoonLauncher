@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoonLauncher</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="enhance.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="startupSplash" class="startup-splash show">
+        <div class="startup-card">
+            <div class="startup-logo">
+                <svg viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="50" r="45" stroke="url(#splash-gradient)" stroke-width="3" fill="none"/>
+                    <path d="M50 20 C30 20, 20 40, 20 55 C20 75, 35 85, 50 85 C65 85, 80 75, 80 55 C80 40, 70 20, 50 20Z" fill="url(#splash-gradient)" opacity="0.3"/>
+                    <circle cx="50" cy="50" r="25" fill="url(#splash-gradient)"/>
+                    <defs><linearGradient id="splash-gradient" x1="0" y1="0" x2="100" y2="100"><stop offset="0%" stop-color="#cdd8f6"/><stop offset="100%" stop-color="#5ec8f2"/></linearGradient></defs>
+                </svg>
+            </div>
+            <h1 class="startup-title">MoonLauncher</h1>
+            <p class="startup-status" id="startupStatus">Проверка обновлений...</p>
+            <div class="startup-progress-wrap hidden" id="startupProgressWrap">
+                <div class="startup-progress-bar"><div class="startup-progress-fill" id="startupProgressFill"></div></div>
+                <div class="startup-progress-meta">
+                    <span id="startupProgressText">0%</span>
+                    <span id="startupProgressDetail"></span>
+                </div>
+            </div>
+            <div class="startup-actions hidden" id="startupActions">
+                <button class="action-btn primary" id="startupInstallBtn">Установить</button>
+                <button class="action-btn secondary" id="startupSkipBtn">Продолжить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app">
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <div class="logo-small">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="url(#moon-gradient)"/>
+                        <defs>
+                            <linearGradient id="moon-gradient" x1="2" y1="2" x2="22" y2="22">
+                                <stop offset="0%" stop-color="#cdd8f6"/>
+                                <stop offset="100%" stop-color="#5ec8f2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="app-title">MoonLauncher</span>
+            </div>
+            <div class="title-bar-right">
+                <button class="tb-btn minimize" id="btnMinimize">−</button>
+                <button class="tb-btn maximize" id="btnMaximize">□</button>
+                <button class="tb-btn close" id="btnClose">×</button>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <nav class="sidebar">
+                <div class="sidebar-top">
+                    <div class="nav-item active" data-page="home">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span data-i18n="nav_home">Главная</span>
+                    </div>
+                    <div class="nav-item" data-page="mods">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <span data-i18n="nav_mods">Моды</span>
+                    </div>
+                    <div class="nav-item" data-page="shaders">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+                        <span data-i18n="nav_shaders">Шейдеры</span>
+                    </div>
+                    <div class="nav-item" data-page="resourcepacks">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+                        <span data-i18n="nav_resourcepacks">Ресурс паки</span>
+                    </div>
+                    <div class="nav-item" data-page="servers">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                        <span data-i18n="nav_servers">Серверы</span>
+                    </div>
+                    <div class="nav-item" data-page="profiles">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                        <span data-i18n="nav_instances">Инстансы</span>
+                    </div>
+                </div>
+                <div class="sidebar-bottom">
+                    <div class="nav-item" data-page="settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                        <span data-i18n="nav_settings">Настройки</span>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="online-status"><span class="status-dot"></span><span class="status-text" id="onlineCounter">Online: 0</span></div>
+                    <div class="version" id="launcherVersion">v1.0.0</div>
+                </div>
+
+                <!-- User Panel -->
+                <div class="user-panel" id="userPanel">
+                    <div class="user-dropdown-toggle" id="userDropdownToggle">
+                        <img src="https://mc-heads.net/avatar/Steve" alt="User" class="user-avatar" id="panelAvatar">
+                        <div class="user-info">
+                            <span class="user-name" id="panelUserName">Гость</span>
+                            <span class="user-status" id="userStatusText">Оффлайн</span>
+                        </div>
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 14px; height: 14px; margin-left: auto; flex-shrink: 0;"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-item" id="loginBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            <span data-i18n="login_microsoft">Войти через Microsoft</span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item logout" id="logoutBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span data-i18n="logout">Выйти</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="content page-home-active">
+                <!-- Home (Feather-style play hub) -->
+                <div class="page active" id="page-home">
+                    <div class="home-bg"><div class="moon-glow"></div><div class="stars"></div></div>
+                    <div class="home-feather">
+                        <div class="home-play-column">
+                            <div class="welcome-section welcome-compact">
+                                <h2 class="welcome-subtitle" data-i18n="welcome_to">Добро пожаловать,</h2>
+                                <h1 class="welcome-name" id="userName">Гость</h1>
+                            </div>
+                            <div class="instance-hero">
+                                <img src="https://mc-heads.net/body/Steve/128" alt="" class="instance-skin" id="homeSkinPreview">
+                                <div class="instance-hero-info">
+                                    <img src="https://mc-heads.net/avatar/Steve" alt="Avatar" class="profile-avatar" id="userAvatar">
+                                    <div>
+                                        <span class="profile-label" data-i18n="account">Аккаунт</span>
+                                        <span class="profile-name" id="profileName">Не авторизован</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="instance-card">
+                                <label class="instance-label" data-i18n="active_instance">Активный инстанс</label>
+                                <div class="version-dropdown instance-picker" id="profileSelector">
+                                    <img src="https://cdn.modrinth.com/data/P7dR8mSH/icon.png" alt="Loader" class="version-icon" id="loaderIcon">
+                                    <div class="version-info">
+                                        <span class="version-text" id="selectedProfileName">Основной профиль</span>
+                                        <span class="version-subtext" id="selectedVersion">1.20.1 • Vanilla</span>
+                                    </div>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
+                                </div>
+                                <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+                                    <div class="profile-dropdown-list" id="profileDropdownList"></div>
+                                    <div class="profile-dropdown-actions">
+                                        <button class="profile-dropdown-btn" onclick="navigateTo('profiles')">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+                                            <span data-i18n="manage_instances">Управление инстансами</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="instance-stats-row">
+                                    <div class="instance-stat"><span class="stat-label" data-i18n="stat_mods">Моды</span><span class="stat-value" id="homeModCount">0</span></div>
+                                    <div class="instance-stat"><span class="stat-label" data-i18n="stat_last_played">Последний запуск</span><span class="stat-value" id="homeLastPlayed">—</span></div>
+                                    <div class="instance-stat"><span class="stat-label" data-i18n="stat_playtime">Время в игре</span><span class="stat-value" id="homePlayTime">0 ч</span></div>
+                                </div>
+                            </div>
+                            <div class="quick-launch-bar">
+                                <div class="quick-launch-item">
+                                    <label data-i18n="memory_quick">Память</label>
+                                    <div class="slider-container compact">
+                                        <input type="range" min="1024" max="16384" step="512" value="4096" id="homeMemorySlider">
+                                        <span id="homeMemoryValue">4096 МБ</span>
+                                    </div>
+                                </div>
+                                <div class="quick-launch-item">
+                                    <label data-i18n="performance_preset">Производительность</label>
+                                    <select id="homePerformancePreset">
+                                        <option value="balanced" data-i18n="perf_balanced">Сбалансировано</option>
+                                        <option value="maxFps" data-i18n="perf_max_fps">Макс. FPS</option>
+                                        <option value="quality" data-i18n="perf_quality">Качество</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="play-btn play-btn-hero" id="playBtn">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                <span data-i18n="play">Играть</span>
+                            </button>
+                            <p class="quick-server-hint" id="quickServerHint" style="display:none;"></p>
+                        </div>
+                        <div class="home-side-column">
+                            <section class="home-panel">
+                                <div class="home-panel-header">
+                                    <h3 data-i18n="featured_servers">Рекомендуемые серверы</h3>
+                                    <button class="link-btn" onclick="navigateTo('servers')" data-i18n="view_all">Все</button>
+                                </div>
+                                <div class="featured-servers" id="featuredServers"></div>
+                            </section>
+                            <section class="home-panel">
+                                <div class="home-panel-header">
+                                    <h3 data-i18n="minecraft_news">Новости</h3>
+                                </div>
+                                <div class="home-news-compact" id="homeNewsList"></div>
+                            </section>
+                            <div class="quick-actions quick-actions-compact">
+                                <div class="action-card mini" onclick="navigateTo('mods')">
+                                    <div class="action-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                                    <span class="action-title" data-i18n="mods">Моды</span>
+                                </div>
+                                <div class="action-card mini" onclick="navigateTo('shaders')">
+                                    <div class="action-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/></svg></div>
+                                    <span class="action-title" data-i18n="shaders">Шейдеры</span>
+                                </div>
+                                <div class="action-card mini" onclick="navigateTo('resourcepacks')">
+                                    <div class="action-icon indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+                                    <span class="action-title" data-i18n="resourcepacks">Ресурс паки</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mods -->
+                <div class="page page-catalog" id="page-mods">
+                    <div class="page-header">
+                        <h1 data-i18n="mods">Моды</h1>
+                        <div class="header-actions">
+                                <span class="catalog-count" id="modsCount"></span>
+                                <div class="tabs">
+                                <button class="tab active" data-tab="all" data-i18n="all_mods">Все моды</button>
+                                <button class="tab" data-tab="installed" data-i18n="installed">Установленные</button>
+                            </div>
+                        </div>
+                    </div>
+                    <details class="modpack-panel modpack-collapsible">
+                        <summary data-i18n="modpack_share_title">Поделиться сборкой модов</summary>
+                        <div class="modpack-panel-body">
+                            <p data-i18n="modpack_share_desc">Создайте код и отправьте другу — он введёт его и получит те же моды</p>
+                        <div class="modpack-row">
+                            <button class="action-btn primary" id="generateModpackBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                                <span data-i18n="modpack_generate">Создать код сборки</span>
+                            </button>
+                        </div>
+                        <div class="modpack-code-box" id="modpackCodeBox" style="display: none;">
+                            <input type="text" id="generatedModpackCode" readonly>
+                            <button class="action-btn secondary" id="copyModpackCodeBtn" data-i18n="modpack_copy">Копировать</button>
+                        </div>
+                        <div class="modpack-divider"><span data-i18n="modpack_or">или</span></div>
+                        <div class="modpack-row">
+                            <input type="text" id="importModpackInput" placeholder="MOON-XXXXXX или ML1...." data-i18n-placeholder="modpack_input_placeholder">
+                            <button class="action-btn primary" id="importModpackBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span data-i18n="modpack_import">Импортировать сборку</span>
+                            </button>
+                        </div>
+                        <p class="modpack-hint" id="modpackHint"></p>
+                        </div>
+                    </details>
+                    <div id="featuredModsBlock"></div>
+                    <div class="search-bar">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Поиск модов..." id="modsSearch">
+                        <div class="filters">
+                            <select id="modsVersionFilter"><option value="" data-i18n="all_versions">Все версии</option></select>
+                            <select id="modsCategoryFilter">
+                                <option value="" data-i18n="all_categories">Все категории</option>
+                                <option value="optimization">Optimization</option>
+                                <option value="utility">Utility</option>
+                                <option value="technology">Technology</option>
+                                <option value="magic">Magic</option>
+                                <option value="adventure">Adventure</option>
+                                <option value="decoration">Decoration</option>
+                                <option value="worldgen">World Gen</option>
+                                <option value="storage">Storage</option>
+                            </select>
+                            <select id="modsSort">
+                                <option value="relevance" data-i18n="sort_popular">По популярности</option>
+                                <option value="downloads" data-i18n="sort_downloads">По загрузкам</option>
+                                <option value="newest" data-i18n="sort_newest">Новые</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="catalog-hint" id="modsCatalogHint"></p>
+                    <div class="items-list-wrap">
+                        <div class="items-list" id="modsList"></div>
+                        <div class="list-footer" id="modsListFooter"></div>
+                    </div>
+                    <div class="page-actions catalog-footer">
+                        <button class="action-btn secondary" onclick="openFolder('mods')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                            <span data-i18n="open_mods_folder">Открыть папку модов</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shaders -->
+                <div class="page page-catalog" id="page-shaders">
+                    <div class="page-header"><h1 data-i18n="shaders">Шейдеры</h1><div class="header-actions"><span class="catalog-count" id="shadersCount"></span><div class="tabs"><button class="tab active" data-tab="all" data-i18n="all_shaders">Все шейдеры</button><button class="tab" data-tab="installed" data-i18n="installed">Установленные</button></div></div></div>
+                    <div class="search-bar">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Поиск шейдеров..." id="shadersSearch">
+                        <div class="filters">
+                            <select id="shadersVersionFilter"><option value="" data-i18n="all_versions">Все версии</option></select>
+                            <select id="shadersSort"><option value="relevance" data-i18n="sort_popular">По популярности</option><option value="downloads" data-i18n="sort_downloads">По загрузкам</option></select>
+                        </div>
+                    </div>
+                    <div class="items-list-wrap">
+                        <div class="items-list" id="shadersList"></div>
+                        <div class="list-footer" id="shadersListFooter"></div>
+                    </div>
+                    <div class="page-actions catalog-footer">
+                        <button class="action-btn secondary" onclick="openFolder('shaders')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                            <span data-i18n="open_shaders_folder">Открыть папку шейдеров</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resource Packs -->
+                <div class="page page-catalog" id="page-resourcepacks">
+                    <div class="page-header"><h1 data-i18n="resourcepacks">Ресурс паки</h1><div class="header-actions"><span class="catalog-count" id="resourcepacksCount"></span><div class="tabs"><button class="tab active" data-tab="all" data-i18n="all_packs">Все паки</button><button class="tab" data-tab="installed" data-i18n="installed">Установленные</button><button class="tab" data-tab="active" data-i18n="active">Активные</button></div></div></div>
+                    <div class="search-bar">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Поиск ресурспаков..." id="resourcepacksSearch">
+                        <div class="filters">
+                            <select id="resourcepacksVersionFilter"><option value="" data-i18n="all_versions">Все версии</option></select>
+                            <select id="resourcepacksSort"><option value="relevance" data-i18n="sort_popular">По популярности</option><option value="downloads" data-i18n="sort_downloads">По загрузкам</option></select>
+                        </div>
+                    </div>
+                    <div class="items-list-wrap">
+                        <div class="items-list" id="resourcepacksList"></div>
+                        <div class="list-footer" id="resourcepacksListFooter"></div>
+                    </div>
+                    <div class="page-actions catalog-footer">
+                        <button class="action-btn secondary" onclick="openFolder('resourcepacks')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                            <span data-i18n="open_resourcepacks_folder">Открыть папку ресурспаков</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instances (profiles) -->
+                <div class="page" id="page-profiles">
+                    <div class="page-header"><h1 data-i18n="minecraft_instances">Инстансы Minecraft</h1><button class="add-btn" id="showCreateProfile">+ <span data-i18n="new_instance">Новый инстанс</span></button></div>
+                    <div class="create-profile-form" id="createProfileForm" style="display: none;">
+                        <div class="form-group"><label data-i18n="instance_name">Название инстанса</label><input type="text" id="newProfileName" placeholder="Например: Fabric 1.21"></div>
+                        <div class="form-group"><label data-i18n="minecraft_version">Версия Minecraft</label><select id="profileVersionSelect"><option value="" data-i18n="select_version">Выберите версию...</option></select></div>
+                        <div class="form-group"><label data-i18n="loader">Загрузчик</label><select id="profileLoaderSelect">
+                            <option value="vanilla" data-i18n="vanilla">Vanilla (без модов)</option>
+                            <option value="fabric" data-i18n="fabric">Fabric</option>
+                            <option value="quilt" data-i18n="quilt">Quilt</option>
+                            <option value="forge" data-i18n="forge">Forge</option>
+                            <option value="neoforge" data-i18n="neoforge">NeoForge</option>
+                        </select></div>
+                        <div class="form-group" id="loaderVersionGroup" style="display: none;"><label data-i18n="loader_version">Версия загрузчика</label><select id="loaderVersionSelect"><option value="" data-i18n="latest">Последняя</option></select></div>
+                        <div class="form-actions">
+                            <button class="action-btn secondary" id="cancelCreateProfile" data-i18n="cancel">Отмена</button>
+                            <button class="action-btn primary" id="createProfileBtn" data-i18n="create">Создать</button>
+                        </div>
+                    </div>
+                    <div class="profiles-list" id="profilesList"></div>
+                </div>
+
+                <!-- Servers -->
+                <div class="page" id="page-servers">
+                    <div class="page-header"><h1 data-i18n="servers">Серверы</h1><div class="header-actions"><div class="tabs"><button class="tab active" data-tab="all" data-i18n="all_servers">Все серверы</button><button class="tab" data-tab="favorites" data-i18n="favorites">Избранные</button></div></div></div>
+                    <div class="search-bar">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" placeholder="Поиск серверов..." id="serversSearch">
+                        <div class="filters"><select id="serversTypeFilter"><option value="" data-i18n="all">Все</option><option value="survival" data-i18n="survival">Выживание</option><option value="skyblock">SkyBlock</option><option value="minigames" data-i18n="minigames">Мини-игры</option><option value="creative">Креатив</option><option value="anarchy" data-i18n="anarchy">Анархия</option><option value="mmorpg" data-i18n="mmorpg">MMORPG</option></select></div>
+                    </div>
+                    <div class="servers-list" id="serversList"></div>
+                </div>
+
+                <!-- Settings -->
+                <div class="page" id="page-settings">
+                    <div class="page-header"><h1 data-i18n="settings">Настройки</h1></div>
+                    <div class="settings-container">
+                        <div class="settings-sidebar">
+                            <button class="settings-tab active" data-settings="general" data-i18n="settings_general">Общие</button>
+                            <button class="settings-tab" data-settings="performance" data-i18n="settings_performance">Производительность</button>
+                            <button class="settings-tab" data-settings="java" data-i18n="settings_java">Java</button>
+                            <button class="settings-tab" data-settings="game" data-i18n="settings_game">Игра</button>
+                            <button class="settings-tab" data-settings="appearance" data-i18n="settings_appearance">Внешний вид</button>
+                            <button class="settings-tab" data-settings="launcher" data-i18n="settings_launcher">Лаунчер</button>
+                            <button class="settings-tab" data-settings="diagnostics" data-i18n="settings_diagnostics">Диагностика</button>
+                            <button class="settings-tab" data-settings="about" data-i18n="settings_about">О программе</button>
+                        </div>
+                        <div class="settings-content">
+                            <!-- Общие -->
+                            <div class="settings-panel active" id="settings-general">
+                                <h3 class="settings-section-title" data-i18n="language_region">Язык и регион</h3>
+                                <div class="setting-item"><label data-i18n="launcher_language">Язык лаунчера</label><select id="languageSelect"><option value="ru">Русский</option><option value="en">English</option></select></div>
+
+                                <h3 class="settings-section-title" data-i18n="startup">Запуск</h3>
+                                <div class="setting-item"><label data-i18n="auto_start">Запускать при старте системы</label><label class="toggle"><input type="checkbox" id="autoStart"><span class="toggle-slider"></span></label></div>
+                                <div class="setting-item"><label data-i18n="minimize_to_tray">Сворачивать в трей при закрытии</label><label class="toggle"><input type="checkbox" id="minimizeToTray" checked><span class="toggle-slider"></span></label></div>
+                                <div class="setting-item"><label data-i18n="minimize_on_launch">Сворачивать лаунчер при запуске игры</label><label class="toggle"><input type="checkbox" id="minimizeOnLaunch" checked><span class="toggle-slider"></span></label></div>
+                            </div>
+
+                            <!-- Performance (Feather-style) -->
+                            <div class="settings-panel" id="settings-performance">
+                                <h3 class="settings-section-title" data-i18n="performance_preset">Пресет производительности</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="performance_mode">Режим</label>
+                                    <select id="performancePreset">
+                                        <option value="balanced" data-i18n="perf_balanced">Сбалансировано</option>
+                                        <option value="maxFps" data-i18n="perf_max_fps">Максимальный FPS</option>
+                                        <option value="quality" data-i18n="perf_quality">Качество графики</option>
+                                    </select>
+                                </div>
+                                <h3 class="settings-section-title" data-i18n="game_optimizations">Оптимизации игры</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="opt_chunk_loading">Быстрая графика (fast graphics, mipmap 0, без облаков)</label>
+                                    <label class="toggle"><input type="checkbox" id="optChunkLoading" checked><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="opt_entity_culling">Без теней сущностей и с минимумом частиц</label>
+                                    <label class="toggle"><input type="checkbox" id="optEntityCulling"><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="opt_vbo">Отключить VSync (снимает лимит FPS)</label>
+                                    <label class="toggle"><input type="checkbox" id="optVbo" checked><span class="toggle-slider"></span></label>
+                                </div>
+                                <p class="settings-hint" data-i18n="perf_hint">Пресет реально меняет видеонастройки Minecraft (options.txt) и память/GC при запуске — рендер, тени, частицы, VSync, а не только флаги Java.</p>
+                            </div>
+
+                            <!-- Java -->
+                            <div class="settings-panel" id="settings-java">
+                                <h3 class="settings-section-title" data-i18n="java_path">Путь к Java</h3>
+                                <div class="setting-item setting-item-vertical">
+                                    <label data-i18n="use_system_java">Использовать системную Java</label>
+                                    <label class="toggle"><input type="checkbox" id="useSystemJava" checked><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item setting-item-vertical" id="customJavaPathGroup" style="display: none;">
+                                    <label data-i18n="custom_java_path">Путь к исполняемому файлу Java (java.exe)</label>
+                                    <div class="path-input-group">
+                                        <input type="text" id="customJavaPath" placeholder="C:\Program Files\Java\jdk-17\bin\java.exe" readonly>
+                                        <button class="action-btn secondary" id="browseJavaBtn">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                                            <span data-i18n="browse">Обзор</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <h3 class="settings-section-title" data-i18n="jvm_args">Аргументы JVM</h3>
+                                <div class="setting-item setting-item-vertical">
+                                    <label data-i18n="java_args_label">Аргументы запуска Java</label>
+                                    <textarea id="javaArgs" rows="3">-Xmx2G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200</textarea>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="auto_memory">Выделить память автоматически</label>
+                                    <label class="toggle"><input type="checkbox" id="autoMemory" checked><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item" id="manualMemoryGroup" style="display: none;">
+                                    <label data-i18n="memory_mb">Выделить памяти (МБ)</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="512" max="16384" step="512" value="2048" id="memorySlider">
+                                        <span id="memoryValue">2048 МБ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Игра -->
+                            <div class="settings-panel" id="settings-game">
+                                <h3 class="settings-section-title" data-i18n="resolution">Разрешение</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="window_resolution">Разрешение окна</label>
+                                    <select id="gameResolution">
+                                        <option value="auto" data-i18n="auto_current">Авто (текущее)</option>
+                                        <option value="1920x1080">1920x1080 (Full HD)</option>
+                                        <option value="1600x900">1600x900</option>
+                                        <option value="1366x768">1366x768</option>
+                                        <option value="1280x720">1280x720 (HD)</option>
+                                        <option value="854x480">854x480</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="fullscreen">Запускать в полноэкранном режиме</label>
+                                    <label class="toggle"><input type="checkbox" id="fullscreen"><span class="toggle-slider"></span></label>
+                                </div>
+
+                                <h3 class="settings-section-title" data-i18n="game_folder">Папка игры</h3>
+                                <div class="setting-item setting-item-vertical">
+                                    <label data-i18n="minecraft_folder">Папка Minecraft</label>
+                                    <div class="path-input-group">
+                                        <input type="text" id="gameDirPath" placeholder="Авто" readonly>
+                                        <button class="action-btn secondary" id="browseGameDirBtn">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                                            <span data-i18n="browse">Обзор</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Внешний вид -->
+                            <div class="settings-panel" id="settings-appearance">
+                                <h3 class="settings-section-title" data-i18n="theme">Тема</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="launcher_theme">Тема лаунчера</label>
+                                    <select id="themeSelect"><option value="dark" data-i18n="dark">Тёмная</option><option value="light" data-i18n="light">Светлая</option><option value="auto" data-i18n="system">Системная</option></select>
+                                </div>
+
+                                <h3 class="settings-section-title" data-i18n="effects">Эффекты</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="transparency">Прозрачность интерфейса</label>
+                                    <div class="slider-container"><input type="range" min="50" max="100" value="80" id="transparencySlider"><span id="transparencyValue">80%</span></div>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="animations">Анимации интерфейса</label>
+                                    <label class="toggle"><input type="checkbox" id="animations" checked><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="blur">Размытие фона</label>
+                                    <label class="toggle"><input type="checkbox" id="blurEffects" checked><span class="toggle-slider"></span></label>
+                                </div>
+
+                                <h3 class="settings-section-title" data-i18n="home_background">Задний фон главного меню</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="home_background_label">Своё изображение фона</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <img id="homeBackgroundPreview" style="display:none; width:56px; height:36px; border-radius:6px; object-fit:cover; border:1px solid var(--border-color);" alt="">
+                                        <button type="button" class="action-btn secondary" id="chooseHomeBackgroundBtn" data-i18n="choose_image">Выбрать изображение</button>
+                                        <button type="button" class="action-btn secondary" id="resetHomeBackgroundBtn" style="display:none;" data-i18n="reset">Сбросить</button>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="home_background_dim">Затемнение фона</label>
+                                    <div class="slider-container"><input type="range" min="0" max="90" value="45" id="homeBackgroundDimSlider"><span id="homeBackgroundDimValue">45%</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Лаунчер -->
+                            <div class="settings-panel" id="settings-launcher">
+                                <h3 class="settings-section-title" data-i18n="updates">Обновления</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="update_channel">Канал обновлений</label>
+                                    <select id="updateChannel">
+                                        <option value="stable" data-i18n="stable">Стабильный</option>
+                                        <option value="beta" data-i18n="beta">Бета</option>
+                                        <option value="dev" data-i18n="dev">Разработка</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="check_updates_now">Проверка обновлений</label>
+                                    <button type="button" class="action-btn secondary" id="checkUpdatesNowBtn" data-i18n="check_updates_now_btn">Проверить сейчас</button>
+                                </div>
+                                <p style="color:var(--text-muted);font-size:12px;margin:-4px 0 12px;" data-i18n="updates_auto_hint">Обновления проверяются автоматически при каждом запуске лаунчера.</p>
+
+                                <h3 class="settings-section-title" data-i18n="network">Сеть</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="download_mirror">Зеркало загрузок</label>
+                                    <select id="downloadMirror">
+                                        <option value="official">Официальное (Mojang)</option>
+                                        <option value="bmclapi">BMCLAPI (Китай, быстрое)</option>
+                                        <option value="mcbbs">MCBBS (Китай)</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="speed_limit">Ограничение скорости загрузки</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="0" max="50" value="0" id="speedLimitSlider">
+                                        <span id="speedLimitValue" data-i18n="no_limit">Без ограничения</span>
+                                    </div>
+                                </div>
+
+                                <h3 class="settings-section-title" data-i18n="additional">Дополнительно</h3>
+                                <div class="setting-item">
+                                    <label data-i18n="save_logs">Сохранять логи запуска</label>
+                                    <label class="toggle"><input type="checkbox" id="saveLogs" checked><span class="toggle-slider"></span></label>
+                                </div>
+                                <div class="setting-item">
+                                    <label data-i18n="debug_mode">Отладочный режим</label>
+                                    <label class="toggle"><input type="checkbox" id="debugMode"><span class="toggle-slider"></span></label>
+                                </div>
+                            </div>
+
+                            <!-- Диагностика -->
+                            <div class="settings-panel" id="settings-diagnostics">
+                                <h3 class="settings-section-title" data-i18n="crash_reports">Краш-репорты</h3>
+                                <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;" data-i18n="last_20_crashes">Последние 20 краш-репортов Minecraft</p>
+                                <div class="diagnostics-list" id="crashReportsList">
+                                    <div style="color:var(--text-muted);font-size:13px;padding:12px;" data-i18n="no_crashes">Нет краш-репортов</div>
+                                </div>
+
+                                <h3 class="settings-section-title" style="margin-top:24px;" data-i18n="launch_logs">Логи запуска</h3>
+                                <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;" data-i18n="moonlauncher_logs">Логи запусков через MoonLauncher</p>
+                                <div class="diagnostics-list" id="launchLogsList">
+                                    <div style="color:var(--text-muted);font-size:13px;padding:12px;" data-i18n="no_logs">Нет логов</div>
+                                </div>
+                            </div>
+
+                            <!-- О программе -->
+                            <div class="settings-panel" id="settings-about">
+                                <div class="about-content">
+                                    <div class="about-logo">
+                                        <svg viewBox="0 0 100 100" fill="none">
+                                            <circle cx="50" cy="50" r="45" stroke="url(#about-gradient)" stroke-width="3" fill="none"/>
+                                            <circle cx="50" cy="50" r="25" fill="url(#about-gradient)"/>
+                                            <defs><linearGradient id="about-gradient" x1="0" y1="0" x2="100" y2="100"><stop offset="0%" stop-color="#cdd8f6"/><stop offset="100%" stop-color="#5ec8f2"/></linearGradient></defs>
+                                        </svg>
+                                    </div>
+                                    <h2>MoonLauncher</h2>
+                                    <p class="about-version" id="aboutVersion">Версия 1.0.0</p>
+                                    <p class="about-desc" data-i18n="about_desc">Современный лаунчер для Minecraft с поддержкой модов, шейдеров и ресурспаков.</p>
+
+                                    <div class="about-links">
+                                        <button class="about-link" onclick="require('electron').shell.openExternal('https://moonlauncher.ru')">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                            <span data-i18n="website">Сайт</span>
+                                        </button>
+                                        <button class="about-link" onclick="require('electron').shell.openExternal('https://github.com/MoonLauncherofficial/MoonLauncher')">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+                                            <span>GitHub</span>
+                                        </button>
+                                        <button class="about-link" onclick="require('electron').shell.openExternal('https://discord.gg/pqtJZ5GFkk')">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                                            <span>Discord</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="about-credits">
+                                        <p data-i18n="created_with_love">Создано с ❤️ командой MoonLauncher</p>
+                                        <p>Лицензия: <a href="#" onclick="require('electron').shell.openExternal('https://github.com/MoonLauncherofficial/MoonLauncher/blob/main/LICENSE')" style="color:var(--accent-purple);text-decoration:none;">MIT</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Update Available Modal -->
+    <div class="modal" id="updateModal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="auth-logo" style="width: 60px; height: 60px; margin-bottom: 16px;">
+                <svg viewBox="0 0 100 100" fill="none">
+                    <circle cx="50" cy="50" r="45" stroke="url(#auth-gradient)" stroke-width="3" fill="none"/>
+                    <path d="M50 20 C30 20, 20 40, 20 55 C20 75, 35 85, 50 85 C65 85, 80 75, 80 55 C80 40, 70 20, 50 20Z" fill="url(#auth-gradient)" opacity="0.3"/>
+                    <circle cx="50" cy="50" r="25" fill="url(#auth-gradient)"/>
+                    <defs><linearGradient id="auth-gradient" x1="0" y1="0" x2="100" y2="100"><stop offset="0%" stop-color="#cdd8f6"/><stop offset="100%" stop-color="#5ec8f2"/></linearGradient></defs>
+                </svg>
+            </div>
+            <h2 style="font-size: 20px; margin-bottom: 8px;" data-i18n="update_available">Доступно обновление!</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px;" id="updateVersionText">MoonLauncher v1.0.1</p>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;" id="updateChangelog">Исправления и улучшения</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="action-btn secondary" id="skipUpdateBtn" style="flex: 1;" data-i18n="later">Позже</button>
+                <button class="action-btn primary" id="downloadUpdateBtn" style="flex: 1;" data-i18n="download">Скачать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="auth-screen">
+                <div class="auth-logo">
+                    <svg viewBox="0 0 100 100" fill="none">
+                        <circle cx="50" cy="50" r="45" stroke="url(#auth-gradient)" stroke-width="3" fill="none"/>
+                        <path d="M50 20 C30 20, 20 40, 20 55 C20 75, 35 85, 50 85 C65 85, 80 75, 80 55 C80 40, 70 20, 50 20Z" fill="url(#auth-gradient)" opacity="0.3"/>
+                        <circle cx="50" cy="50" r="25" fill="url(#auth-gradient)"/>
+                        <defs><linearGradient id="auth-gradient" x1="0" y1="0" x2="100" y2="100"><stop offset="0%" stop-color="#cdd8f6"/><stop offset="100%" stop-color="#5ec8f2"/></linearGradient></defs>
+                    </svg>
+                </div>
+                <h2>MoonLauncher</h2>
+                <p data-i18n="auth_subtitle">Твой портал в мир игры</p>
+                <button class="microsoft-login-btn" id="microsoftLoginBtn">
+                    <svg viewBox="0 0 21 21" fill="none"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+                    <span data-i18n="login_microsoft">Войти через Microsoft</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modpack Import Modal -->
+    <div class="launch-modal" id="modpackModal">
+        <div class="launch-modal-content">
+            <div class="launch-header">
+                <div class="launch-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="url(#modpack-gradient)" stroke-width="2"/>
+                        <polyline points="7 10 12 15 17 10" stroke="url(#modpack-gradient)" stroke-width="2"/>
+                        <line x1="12" y1="15" x2="12" y2="3" stroke="url(#modpack-gradient)" stroke-width="2"/>
+                        <defs>
+                            <linearGradient id="modpack-gradient" x1="0" y1="0" x2="24" y2="24">
+                                <stop offset="0%" stop-color="#cdd8f6"/>
+                                <stop offset="100%" stop-color="#5ec8f2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h2 class="launch-title" data-i18n="modpack_importing">Импорт сборки модов</h2>
+                <p class="launch-subtitle" id="modpackStage">Подготовка...</p>
+            </div>
+            <div class="launch-progress-container">
+                <div class="launch-progress-bar">
+                    <div class="launch-progress-fill" id="modpackProgressFill"></div>
+                </div>
+                <div class="launch-progress-info">
+                    <span class="launch-percent" id="modpackPercent">0%</span>
+                    <span class="launch-detail" id="modpackDetail"></span>
+                </div>
+            </div>
+            <div class="launch-actions">
+                <button class="launch-cancel-btn" id="modpackCloseBtn">
+                    <span data-i18n="cancel">Закрыть</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Launch Progress Modal -->
+    <div class="launch-modal" id="launchModal">
+        <div class="launch-modal-content">
+            <div class="launch-header">
+                <div class="launch-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="url(#launch-gradient)" stroke-width="2"/>
+                        <path d="M12 6v6l4 2" stroke="url(#launch-gradient)" stroke-width="2" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="launch-gradient" x1="0" y1="0" x2="24" y2="24">
+                                <stop offset="0%" stop-color="#cdd8f6"/>
+                                <stop offset="100%" stop-color="#5ec8f2"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h2 class="launch-title" data-i18n="launching_minecraft">Запуск Minecraft</h2>
+                <p class="launch-subtitle" id="launchStage">Подготовка...</p>
+            </div>
+
+            <div class="launch-progress-container">
+                <div class="launch-progress-bar">
+                    <div class="launch-progress-fill" id="launchProgressFill"></div>
+                </div>
+                <div class="launch-progress-info">
+                    <span class="launch-percent" id="launchPercent">0%</span>
+                    <span class="launch-detail" id="launchDetail"></span>
+                </div>
+            </div>
+
+            <div class="launch-actions">
+                <button class="launch-cancel-btn" id="launchCancelBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    <span data-i18n="cancel">Отмена</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="enhance.js"></script>
+</body>
+</html>

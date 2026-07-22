@@ -1,0 +1,279 @@
+/* =========================================================
+   MoonLauncher — Visual & Motion Enhancement Layer
+   Loaded after styles.css. Pure additive polish:
+   richer depth, motion, glow and micro-interactions.
+   Does not remove or rename any existing selector.
+   ========================================================= */
+
+:root {
+    --glow-purple: 0 0 24px rgba(79, 124, 255, .45);
+    --glow-purple-soft: 0 0 16px rgba(79, 124, 255, .25);
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+    --ease-smooth: cubic-bezier(.22, 1, .36, 1);
+    --grad-aurora-1: radial-gradient(circle, rgba(79,124,255,.35), transparent 65%);
+    --grad-aurora-2: radial-gradient(circle, rgba(94,200,242,.28), transparent 65%);
+    --grad-aurora-3: radial-gradient(circle, rgba(201,166,255,.22), transparent 65%);
+}
+
+/* ---------- Ambient aurora backdrop (no HTML changes needed) ---------- */
+#app { position: relative; isolation: isolate; }
+#app::before {
+    content: "";
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+        var(--grad-aurora-1) 15% 20% / 60% 60% no-repeat,
+        var(--grad-aurora-2) 85% 15% / 55% 55% no-repeat,
+        var(--grad-aurora-3) 50% 90% / 50% 50% no-repeat;
+    filter: blur(60px);
+    opacity: .55;
+    animation: auroraDrift 22s ease-in-out infinite alternate;
+    mix-blend-mode: screen;
+}
+html.theme-light #app::before { opacity: .22; }
+@keyframes auroraDrift {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    50%  { transform: translate3d(-2%, 3%, 0) scale(1.08); }
+    100% { transform: translate3d(3%, -2%, 0) scale(1.02); }
+}
+.title-bar, .main-container { position: relative; z-index: 1; }
+
+/* ---------- Global motion polish ---------- */
+* { scrollbar-width: thin; }
+/* Раньше will-change: transform стоял постоянно на .item-row и других card-классах,
+   которые могут повторяться десятками штук на странице (до 50 в каталоге модов/
+   шейдеров/ресурспаков). will-change заставляет Chromium навсегда промоутить
+   каждый такой элемент в отдельный GPU-композитный слой — с полусотней таких
+   слоёв разом (а они ещё и пересоздаются при каждой новой загрузке каталога,
+   поиске, смене вкладки) интерфейс тормозит всё сильнее, чем дольше листаешь
+   эти страницы. Оставляем постоянный will-change только там, где элементов
+   всегда мало и фиксировано (навигация, кнопки, вкладки), а карточкам включаем
+   его только на :hover — тогда в GPU-слой попадает максимум один элемент разом. */
+button, .nav-item, .tab, .icon-btn {
+    will-change: transform;
+}
+.item-row:hover, .action-card:hover, .profile-card:hover,
+.instance-card:hover, .home-panel:hover, .server-item:hover, .featured-server-card:hover {
+    will-change: transform;
+}
+
+/* ---------- Buttons: shine sweep + press feedback ---------- */
+.play-btn, .action-btn, .add-btn, .item-btn.install, .microsoft-login-btn, .server-join-btn {
+    position: relative; overflow: hidden;
+    transition: transform .22s var(--ease-smooth), box-shadow .3s var(--ease-smooth), opacity .2s ease, filter .2s ease;
+}
+.play-btn::after, .action-btn::after, .add-btn::after, .item-btn.install::after, .server-join-btn::after {
+    content: "";
+    position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
+    transform: skewX(-20deg);
+    pointer-events: none;
+    transition: left .55s var(--ease-smooth);
+}
+.play-btn:hover::after, .action-btn.primary:hover::after, .add-btn:hover::after,
+.item-btn.install:hover::after, .server-join-btn:hover::after { left: 130%; }
+.play-btn:active, .action-btn:active, .add-btn:active, .item-btn:active,
+.microsoft-login-btn:active, .server-join-btn:active, .icon-btn:active, .tb-btn:active {
+    transform: scale(.94);
+}
+
+/* Hero play button — soft breathing glow when idle.
+   Раньше глоу анимировался через box-shadow в keyframes: box-shadow не композитится
+   на GPU, поэтому браузер перерисовывал (paint) всю кнопку 60 раз в секунду,
+   бесконечно, даже пока лаунчер свёрнут. Теперь box-shadow статичный (задан один раз),
+   а "дыхание" делает псевдоэлемент через opacity+transform — это композитор,
+   без перерисовки основного слоя. */
+.play-btn-hero {
+    position: relative;
+    box-shadow: 0 6px 30px rgba(255, 122, 156, .3), 0 0 16px rgba(255, 157, 77, .22);
+}
+.play-btn-hero::before {
+    content: "";
+    position: absolute; inset: -6px; z-index: -1; border-radius: inherit;
+    pointer-events: none;
+    box-shadow: 0 6px 34px rgba(255, 122, 156, .42), 0 0 0 8px rgba(255, 176, 105, .18);
+    opacity: .6;
+    animation: playPulseGlow 3.2s ease-in-out infinite;
+    will-change: opacity, transform;
+}
+.play-btn-hero:hover { box-shadow: 0 10px 40px rgba(255, 122, 156, .5); }
+.play-btn-hero:hover::before { animation-play-state: paused; opacity: 1; }
+.play-btn-hero.loading::before, .play-btn-hero.running::before { animation: none; opacity: 0; }
+@keyframes playPulseGlow {
+    0%, 100% { opacity: .5; transform: scale(1); }
+    50%      { opacity: 1; transform: scale(1.035); }
+}
+
+/* Secondary buttons: gentle lift */
+.action-btn.secondary:hover, .microsoft-login-btn:hover { transform: translateY(-2px); }
+
+/* Icon / titlebar buttons */
+.icon-btn, .tb-btn { transition: transform .18s var(--ease-spring), background .2s ease, color .2s ease; }
+.icon-btn:hover { transform: translateY(-1px) scale(1.06); }
+.tb-btn:hover { transform: scale(1.08); }
+
+/* ---------- Nav rail: sliding accent + icon motion ---------- */
+.nav-item {
+    position: relative;
+    transition: background .25s var(--ease-smooth), color .25s ease, transform .2s var(--ease-spring), padding-left .25s ease;
+}
+.nav-item::before {
+    content: "";
+    position: absolute; left: -8px; top: 50%; width: 3px; height: 0;
+    background: var(--gradient-purple); border-radius: 3px;
+    transform: translateY(-50%);
+    transition: height .25s var(--ease-smooth);
+}
+.nav-item.active::before { height: 60%; }
+.nav-item.active { box-shadow: var(--glow-purple-soft); }
+.nav-item:hover { transform: translateX(2px); }
+.nav-item svg { transition: transform .25s var(--ease-spring); }
+.nav-item:hover svg { transform: scale(1.12); }
+
+/* ---------- Cards: lift, border glow, image zoom ---------- */
+.item-row, .profile-card, .instance-card, .home-panel, .action-card,
+.featured-server-card, .server-item {
+    transition: transform .28s var(--ease-smooth), box-shadow .28s var(--ease-smooth),
+                border-color .28s ease, background .28s ease;
+}
+.item-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.28), 0 0 0 1px rgba(79,124,255,.25);
+}
+.item-row:hover .item-icon, .item-row:hover .item-icon-placeholder { transform: scale(1.06); }
+.item-icon, .item-icon-placeholder { transition: transform .3s var(--ease-smooth); }
+
+.profile-card:hover, .action-card:hover, .featured-server-card:hover, .server-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,0,0,.32), 0 0 0 1px rgba(79,124,255,.3);
+    border-color: var(--accent-purple);
+}
+.home-panel:hover { box-shadow: 0 8px 24px rgba(0,0,0,.22); }
+.action-card.mini { transition: transform .2s var(--ease-spring), box-shadow .2s ease; }
+.action-card.mini:hover .action-icon { transform: rotate(-6deg) scale(1.12); }
+.action-icon { transition: transform .25s var(--ease-spring); }
+
+/* Instance hero portrait — subtle float */
+.instance-skin { animation: floatY 5s ease-in-out infinite; }
+@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* ---------- Inputs & selects: focus glow ---------- */
+input, select, textarea {
+    transition: border-color .2s ease, box-shadow .25s ease, transform .15s ease;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-purple) !important;
+    box-shadow: 0 0 0 3px rgba(79, 124, 255, .18);
+    outline: none;
+}
+input[type="range"] { accent-color: var(--accent-purple); }
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    transition: box-shadow .2s ease, transform .15s var(--ease-spring);
+}
+.slider-container input[type="range"]:hover::-webkit-slider-thumb,
+.slider-container input[type="range"]:active::-webkit-slider-thumb {
+    box-shadow: 0 0 0 6px rgba(79, 124, 255, .18);
+    transform: scale(1.1);
+}
+
+/* ---------- Page transitions ---------- */
+.page.active { animation: pageIn .38s var(--ease-smooth); }
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(14px) scale(.99); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Progress bars: animated gradient stripes ---------- */
+.startup-progress-bar, .progress-bar, .startup-progress-fill, .progress-fill {
+    position: relative; overflow: hidden;
+}
+.startup-progress-fill, .progress-fill {
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-indigo), var(--accent-pink), var(--accent-purple));
+    background-size: 300% 100%;
+    animation: gradientFlow 2.4s linear infinite;
+    box-shadow: 0 0 12px rgba(79, 124, 255, .5);
+}
+@keyframes gradientFlow { 0% { background-position: 0% 0; } 100% { background-position: 300% 0; } }
+
+/* ---------- Toasts: glass, spring-in, auto-dismiss bar ---------- */
+.toast {
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 14px 40px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.04);
+    overflow: hidden;
+    transition: transform .45s var(--ease-spring), opacity .3s ease;
+}
+.toast.show { animation: toastSpring .45s var(--ease-spring); }
+@keyframes toastSpring {
+    0%   { transform: translateX(120%) scale(.9); opacity: 0; }
+    60%  { transform: translateX(-6%) scale(1.02); opacity: 1; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+.toast-icon { transition: transform .3s var(--ease-spring); }
+.toast.show .toast-icon { animation: iconPop .4s var(--ease-spring) .1s both; }
+@keyframes iconPop { from { transform: scale(0); } to { transform: scale(1); } }
+.toast::after {
+    content: "";
+    position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+    background: currentColor; opacity: .5; transform-origin: left;
+    animation: toastTimer 4s linear forwards;
+}
+.toast-success::after { background: var(--accent-green); }
+.toast-error::after { background: var(--accent-red); }
+.toast-info::after { background: var(--accent-blue); }
+@keyframes toastTimer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ---------- Scrollbars: slim gradient ---------- */
+.content::-webkit-scrollbar-thumb, .items-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent-purple), var(--accent-indigo));
+    border-radius: 6px;
+}
+.content::-webkit-scrollbar-thumb:hover, .items-list::-webkit-scrollbar-thumb:hover { filter: brightness(1.2); }
+
+/* ---------- Status dot: richer glow ---------- */
+.status-dot { box-shadow: 0 0 0 3px rgba(52, 211, 153, .15), 0 0 10px var(--accent-green); }
+
+/* ---------- Title bar: subtle animated accent line + logo glow ---------- */
+.title-bar { position: relative; }
+.title-bar::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-pink), var(--accent-purple), transparent);
+    background-size: 200% 100%;
+    animation: gradientFlow 6s linear infinite;
+    opacity: .6;
+}
+.logo-small svg { filter: drop-shadow(0 0 6px rgba(79, 124, 255, .5)); transition: filter .2s ease; }
+.title-bar-left:hover .logo-small svg { filter: drop-shadow(0 0 10px rgba(79, 124, 255, .8)); }
+.app-title { background: linear-gradient(90deg, var(--text-secondary), var(--accent-purple), var(--text-secondary));
+    background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: gradientFlow 8s linear infinite; }
+
+/* ---------- Startup splash: refined ---------- */
+.startup-logo svg { filter: drop-shadow(0 0 18px rgba(79, 124, 255, .55)); animation: logoBreathe 3s ease-in-out infinite; }
+@keyframes logoBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* ---------- Reduced motion respect ---------- */
+@media (prefers-reduced-motion: reduce) {
+    #app::before, .play-btn-hero::before, .instance-skin, .startup-logo svg,
+    .startup-progress-fill, .progress-fill, .toast.show, .toast.show .toast-icon,
+    .title-bar::after, .app-title {
+        animation: none !important;
+    }
+    .item-row:hover, .profile-card:hover, .action-card:hover,
+    .featured-server-card:hover, .server-item:hover { transform: none; }
+}
+
+/* ---------- Pause decorative animations while window is unfocused/minimized ----------
+   Аврора-фон, градиентная линия в шапке, "дыхание" Play-кнопки и переливающийся
+   заголовок раньше крутились бесконечно в фоне, даже когда лаунчер свёрнут или
+   не в фокусе — впустую грузили GPU/CPU. enhance.js вешает класс anim-paused
+   на <html> по событиям window blur/focus. */
+html.anim-paused #app::before,
+html.anim-paused .play-btn-hero::before,
+html.anim-paused .title-bar::after,
+html.anim-paused .app-title,
+html.anim-paused .instance-skin,
+html.anim-paused .startup-progress-fill,
+html.anim-paused .progress-fill {
+    animation-play-state: paused !important;
+}

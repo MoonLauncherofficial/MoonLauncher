@@ -889,6 +889,12 @@ textarea:focus { border-color: var(--accent-purple); }
     opacity: 1;
 }
 
+.toast.toast-dismissing {
+    transition: all 0.15s ease-in;
+    transform: translateX(120%);
+    opacity: 0;
+}
+
 .toast-icon {
     width: 28px;
     height: 28px;

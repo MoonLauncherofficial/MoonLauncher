@@ -574,11 +574,23 @@ function showToast(title, message, type = 'info') {
             <div class="toast-message">${escapeHtml(message)}</div>
         </div>
     `;
+    let dismissTimer = null;
+    let removeTimer = null;
+    const dismiss = () => {
+        if (dismissTimer) clearTimeout(dismissTimer);
+        if (removeTimer) clearTimeout(removeTimer);
+        toast.classList.remove('show');
+        toast.classList.add('toast-dismissing');
+        setTimeout(() => toast.remove(), 200);
+    };
+    toast.addEventListener('click', dismiss);
+    toast.style.cursor = 'pointer';
+    toast.title = currentLang === 'ru' ? 'Нажмите, чтобы закрыть' : 'Click to dismiss';
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
-    setTimeout(() => {
+    dismissTimer = setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
+        removeTimer = setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
 
@@ -2220,6 +2232,8 @@ function renderInstalledList(listId, type) {
         title: item.title,
         filename: item.filename,
         projectId: item.projectId,
+        icon_url: item.iconUrl || '',
+        color: item.color ?? null,
         author: currentLang === 'ru' ? 'Установлено' : 'Installed'
     }));
     renderItems(listId, items, type);
@@ -2234,7 +2248,13 @@ async function renderActiveResourcePacks() {
     }
     const items = activeResourcePacks.map(filename => {
         const detail = installedItemsDetail.resourcepack.find(i => i.filename === filename);
-        return { title: detail?.title || filename.replace('.zip', ''), filename, projectId: detail?.projectId || filename };
+        return {
+            title: detail?.title || filename.replace('.zip', ''),
+            filename,
+            projectId: detail?.projectId || filename,
+            icon_url: detail?.iconUrl || '',
+            color: detail?.color ?? null
+        };
     });
     renderItems('resourcepacksList', items, 'resourcepack');
 }

@@ -2874,6 +2874,8 @@ ipcMain.handle('download-modrinth', async (event, { projectId, versionId, type, 
             projectId,
             versionId,
             title: projectResponse?.data?.title || primaryFile.filename,
+            iconUrl: projectResponse?.data?.icon_url || null,
+            color: projectResponse?.data?.color ?? null,
             type
         });
 
@@ -2931,6 +2933,7 @@ ipcMain.handle('download-featured-mod', async (event, { mod, profile }) => {
             projectId: `featured:${mod.id}`,
             versionId: mod.version || 'featured',
             title: mod.name || mod.filename,
+            iconUrl: mod.icon || mod.iconUrl || null,
             type: 'mod'
         });
 
@@ -3091,6 +3094,7 @@ ipcMain.handle('import-modpack-code', async (event, { code, profile }) => {
                     projectId: item.projectId,
                     versionId,
                     title: item.title || primaryFile.filename,
+                    iconUrl: item.icon_url || item.iconUrl || null,
                     type: itemType
                 });
 
@@ -3343,6 +3347,8 @@ ipcMain.handle('get-installed-items-all', async (event, { profile }) => {
                 projectId: manifest[key][filename]?.projectId || null,
                 title: manifest[key][filename]?.title || filename.replace(ext, ''),
                 versionId: manifest[key][filename]?.versionId || null,
+                iconUrl: manifest[key][filename]?.iconUrl || null,
+                color: manifest[key][filename]?.color ?? null,
                 type
             }));
         };

@@ -3480,6 +3480,20 @@ ipcMain.handle('browse-file', async (event, options) => {
     return result.canceled ? null : result.filePaths[0];
 });
 
+// Сохранение файла, присланного другом в чате (вкладка "Друзья")
+ipcMain.handle('save-friend-file', async (event, { defaultName, dataBase64 }) => {
+    try {
+        const result = await dialog.showSaveDialog(mainWindow, {
+            defaultPath: defaultName || 'file',
+        });
+        if (result.canceled || !result.filePath) return { success: false, canceled: true };
+        fs.writeFileSync(result.filePath, Buffer.from(dataBase64, 'base64'));
+        return { success: true, filePath: result.filePath };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
 ipcMain.handle('browse-folder', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory']

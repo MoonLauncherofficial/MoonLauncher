@@ -449,6 +449,7 @@ function navigateTo(page) {
     else if (page === 'servers') loadServers();
     else if (page === 'profiles') loadProfilesPage();
     else if (page === 'settings') loadSettings();
+    else if (page === 'friends' && typeof window.onFriendsPageOpen === 'function') window.onFriendsPageOpen();
 }
 
 window.navigateTo = navigateTo;
@@ -536,6 +537,8 @@ function updateUserUI(user) {
         }
         loginBtn.style.display = 'flex';
     }
+
+    if (typeof window.onAuthChanged === 'function') window.onAuthChanged(user);
 }
 
 async function checkSavedAuth() {

@@ -5,6 +5,7 @@
   "main": "src/main/main.js",
   "author": "MoonLauncher Team",
   "license": "MIT",
+  "repository": "https://github.com/MoonLauncherofficial/MoonLauncher",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
@@ -34,6 +35,11 @@
       "assets/**/*",
       "package.json"
     ],
+    "publish": {
+      "provider": "github",
+      "owner": "MoonLauncherofficial",
+      "repo": "MoonLauncher"
+    },
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico"

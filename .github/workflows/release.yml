@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'   # запускается только когда пушишь тег вида v1.1.5
 
+permissions:
+  contents: write   # без этого GH_TOKEN может быть read-only, и публикация релиза упадёт с 403
+
 jobs:
   build-and-release:
     runs-on: windows-latest
@@ -16,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install

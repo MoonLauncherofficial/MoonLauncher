@@ -1,6 +1,6 @@
 {
   "name": "moonlauncher",
-  "version": "1.1.8",
+  "version": "1.1.7",
   "description": "MoonLauncher - Твой портал в мир игры",
   "main": "src/main/main.js",
   "author": "MoonLauncher Team",

@@ -896,27 +896,45 @@ function sendUpdateDownloadProgress(payload) {
 }
 
 // ==================== UPDATE CHECKER ====================
+// Источник обновлений — GitHub Releases репозитория MoonLauncherofficial/MoonLauncher.
+// Раньше обновления запрашивались с сайта (moonlauncher.ru/api/launcher-update),
+// а GitHub использовался только как резервный вариант при недоступности сайта.
+// Теперь наоборот: GitHub Releases — основной и единственный источник обновлений,
+// сайт больше не опрашивается.
+const GITHUB_API_LATEST_RELEASE = 'https://api.github.com/repos/MoonLauncherofficial/MoonLauncher/releases/latest';
+
+function normalizeGithubRelease(release, currentVersion) {
+    const latestVersion = (release.tag_name || '').replace(/^v/i, '');
+    // Ищем в assets релиза установщик: обычно .exe (NSIS) для Windows.
+    const asset = release.assets?.find(a => /\.exe$/i.test(a.name))
+        || release.assets?.find(a => /setup|installer/i.test(a.name))
+        || release.assets?.[0];
+
+    return {
+        latestVersion,
+        changelog: release.body || '',
+        downloadUrl: asset?.browser_download_url || `${GITHUB_REPO}/releases`,
+        fileName: asset?.name || `MoonLauncher-${latestVersion || 'latest'}-Setup.exe`,
+        mandatory: false,
+        releaseDate: release.published_at || '',
+        fileSize: asset?.size || 0,
+        // GitHub Releases API не отдаёт sha256 инсталлятора в метаданных ассета,
+        // поэтому проверка целостности при скачивании (см. download-launcher-update)
+        // просто пропускается — сравнивать не с чем.
+        sha256: ''
+    };
+}
+
 ipcMain.handle('check-updates', async () => {
+    const pkg = safeRequire('../../package.json') || safeRequire('../package.json') || { version: '1.0.0' };
+    const currentVersion = pkg.version || '1.0.0';
+
     try {
-        const settings = loadSettingsSync();
-        const channel = settings.updateChannel || 'stable';
-        const endpoints = channel === 'stable'
-            ? [`${UPDATE_BASE_URL}/latest.json`]
-            : [`${UPDATE_BASE_URL}/${channel}/latest.json`, `${UPDATE_BASE_URL}/latest.json`];
-
-        let data = null;
-        for (const endpoint of endpoints) {
-            try {
-                const response = await axios.get(endpoint, { timeout: 10000 });
-                data = response.data;
-                break;
-            } catch (e) {}
-        }
-        if (!data) throw new Error('Update manifest unavailable');
-
-        const pkg = safeRequire('../../package.json') || safeRequire('../package.json') || { version: '1.0.0' };
-        const currentVersion = pkg.version || '1.0.0';
-        const normalized = normalizeUpdateManifest(data);
+        const ghResponse = await axios.get(GITHUB_API_LATEST_RELEASE, {
+            timeout: 10000,
+            headers: { Accept: 'application/vnd.github+json' }
+        });
+        const normalized = normalizeGithubRelease(ghResponse.data, currentVersion);
 
         if (normalized.latestVersion && compareVersions(normalized.latestVersion, currentVersion) > 0) {
             return {
@@ -928,30 +946,7 @@ ipcMain.handle('check-updates', async () => {
         }
         return { success: true, hasUpdate: false, currentVersion };
     } catch (error) {
-        try {
-            const ghResponse = await axios.get('https://api.github.com/repos/MoonLauncherofficial/MoonLauncher/releases/latest', { timeout: 5000 });
-            const latestTag = ghResponse.data.tag_name?.replace('v', '');
-            const pkg = safeRequire('../../package.json') || { version: '1.0.0' };
-
-            if (latestTag && compareVersions(latestTag, pkg.version) > 0) {
-                const asset = ghResponse.data.assets?.find(a => /\.exe$|setup|installer/i.test(a.name));
-                return {
-                    success: true,
-                    hasUpdate: true,
-                    currentVersion: pkg.version,
-                    latestVersion: latestTag,
-                    changelog: ghResponse.data.body || '',
-                    downloadUrl: asset?.browser_download_url || `${GITHUB_REPO}/releases`,
-                    fileName: asset?.name || `MoonLauncher-${latestTag}-Setup.exe`,
-                    releaseDate: ghResponse.data.published_at || '',
-                    mandatory: false,
-                    fileSize: asset?.size || 0
-                };
-            }
-            return { success: true, hasUpdate: false, currentVersion: pkg.version };
-        } catch (e) {
-            return { success: false, error: error.message };
-        }
+        return { success: false, error: error.message };
     }
 });
 

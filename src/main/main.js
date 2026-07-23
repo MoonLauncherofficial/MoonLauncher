@@ -173,13 +173,17 @@ function getOrCreateSessionId() {
     }
 }
 
-// Реальный онлайн-счётчик: сервер (api/online/count.php) регистрирует IP каждого,
-// кто его дернул, и возвращает число уникальных IP за последние 5 минут.
-// Отдельного /online/heartbeat на сервере никогда не было — этот запрос раньше
-// всегда падал в catch и ничего не делал. GET на count.php одновременно и
-// регистрирует "пинг" присутствия, и возвращает актуальное число.
+// Реальный онлайн-счётчик ЛАУНЧЕРА (а не посетителей сайта).
+// Раньше здесь дёргался api/online/count.php — он считает уникальные IP,
+// зашедшие на сайт moonlauncher.ru, и не имеет отношения к тому, сколько
+// людей реально сидит в лаунчере. Теперь используется отдельный серверный
+// эндпоинт api/launcher-online/heartbeat.php:
+//   - POST { clientId } раз в HEARTBEAT_INTERVAL_MS шлёт "я жив" (см. ниже);
+//   - GET просто читает текущее число, ничего не регистрируя.
+// clientId — это getOrCreateSessionId(), тот же постоянный ID лаунчера,
+// который уже хранится в session.id, отдельный ID заводить не нужно.
 async function fetchOnlineCount() {
-    const response = await axios.get(`${MOONLAUNCHER_API}/online/count.php`, { timeout: 5000 });
+    const response = await axios.get(`${MOONLAUNCHER_API}/launcher-online/heartbeat.php`, { timeout: 5000 });
     if (response.data && response.data.offline === true) {
         throw new Error('Server reports offline');
     }
@@ -187,6 +191,34 @@ async function fetchOnlineCount() {
         return response.data.count;
     }
     throw new Error('Bad online count response');
+}
+
+const HEARTBEAT_INTERVAL_MS = 60_000; // должно быть меньше окна на сервере (150с)
+let heartbeatTimer = null;
+
+async function sendOnlineHeartbeat() {
+    try {
+        await axios.post(
+            `${MOONLAUNCHER_API}/launcher-online/heartbeat.php`,
+            { clientId: getOrCreateSessionId() },
+            { timeout: 5000 }
+        );
+    } catch (e) {
+        // Нет сети / сайт недоступен — не критично, пропустим один пинг.
+    }
+}
+
+function startOnlineHeartbeat() {
+    if (heartbeatTimer) return; // уже запущено
+    sendOnlineHeartbeat();
+    heartbeatTimer = setInterval(sendOnlineHeartbeat, HEARTBEAT_INTERVAL_MS);
+}
+
+function stopOnlineHeartbeat() {
+    if (heartbeatTimer) {
+        clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+    }
 }
 
 const PERFORMANCE_PRESET_ARGS = {
@@ -416,10 +448,16 @@ app.whenReady().then(() => {
     if (settings.autoStart) {
         app.setLoginItemSettings({ openAtLogin: true });
     }
+
+    // Лаунчер сворачивается в трей и живёт как процесс дольше, чем открыто окно,
+    // поэтому heartbeat стартует здесь (а не при открытии окна) и живёт до
+    // фактического выхода из приложения — см. before-quit ниже.
+    startOnlineHeartbeat();
 });
 
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
+app.on('before-quit', () => { stopOnlineHeartbeat(); });
 
 // ==================== SETTINGS ====================
 function loadSettingsSync() {
@@ -563,8 +601,8 @@ ipcMain.handle('save-settings', async (event, settings) => {
 });
 
 // ==================== ONLINE COUNTER ====================
-// Возвращает тот же реальный счётчик, что показан на сайте (уникальные IP за 5 минут,
-// без искусственной накрутки). Раньше тут был хардкод "count: 1" при любой ошибке —
+// Возвращает число реально запущенных копий лаунчера (heartbeat.php), а не
+// посетителей сайта. Раньше тут был хардкод "count: 1" при любой ошибке —
 // это и есть та самая имитация, которую нужно было убрать: теперь при недоступности
 // сервера честно возвращаем success:false, а не рисуем произвольную цифру.
 ipcMain.handle('get-online-count', async () => {

@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'   # запускается только когда пушишь тег вида v1.1.5
+
+permissions:
+  contents: write   # без этого GH_TOKEN может быть read-only, и публикация релиза упадёт с 403
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and publish to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win --publish always
+
+      # Опционально: сообщить своему бэкенду, что вышла новая версия,
+      # чтобы moonlauncher.ru/api/launcher-update/latest.json тоже обновился.
+      # Раскомментируй и впиши свой endpoint, когда решишь, как это делать.
+      #
+      # - name: Notify backend about new version
+      #   run: |
+      #     curl -X POST https://moonlauncher.ru/api/launcher-update/publish \
+      #       -H "Authorization: Bearer ${{ secrets.MOONLAUNCHER_API_TOKEN }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d "{\"version\": \"${{ github.ref_name }}\"}"
